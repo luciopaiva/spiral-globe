@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Globe spiral</title>
+
+    <style>
+        body {
+            background-color: black;
+        }
+        #c {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+
+            width: 768px;
+            height: 768px;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<script>
+    // from https://www.dwitter.net/d/683
+    const c = document.getElementById("c");
+    const x = c.getContext("2d");
+    const S = a => Math.sin(a);
+    const C = a => Math.cos(a);
+    const T = a => Math.tan(a);
+    const R = () => {};  // ToDo
+
+    const HALF_PI = Math.PI / 2;
+    let w = 768;
+    const hw = w >>> 1;
+    const r = .80 * hw | 0;
+    console.info(hw, r);
+    c.width = w;
+    c.height = w;
+    x.fillStyle = x.strokeStyle = "#5b70ff";
+    x.lineWidth = 3;
+    x.shadowBlur = 50;
+    x.translate(0, hw - r);
+
+    function update(t) {
+        t /= 2000;  // slow it down
+        // const pd = t % r;
+
+        x.clearRect(0, -hw+r, w, w);
+        const lstep = S(t * 2) * 0.05 + 0.08;
+        const step = Math.PI / 1000;
+
+        x.beginPath();
+        for (let lambda = 0, phi = -HALF_PI; phi < HALF_PI; lambda += lstep, phi += step) {
+            const color = 360 * (phi + HALF_PI) / Math.PI | 0;
+            x.shadowColor = x.strokeStyle = `hsl(${color}, 100%, 50%)`;   // S(t) *  + 180
+            const cx = C(phi) * S(lambda-t) * r + w / 2;
+            const cy = (C(t) * S(phi) - S(t) * C(phi) * C(lambda-t)) * r + r;
+            x.lineTo(cx, cy)
+        }
+        x.stroke();
+
+        // x.beginPath();
+        // x.ellipse(
+        //     C(-HALF_PI) * S(-t) * r + w / 2,
+        //     (C(t) * S(-HALF_PI) - S(t) * C(-HALF_PI) * C(-t)) * r + r,
+        //     8, 8, 0, 0, Math.PI * 2
+        // );
+        // x.fill();
+
+        requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+</script>
+
+</body>
+</html>
