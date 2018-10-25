@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Globe spiral</title>
+    <title>Spiral globe</title>
 
     <style>
         body {
@@ -50,17 +50,24 @@
 
         x.clearRect(0, -hw+r, w, w);
         const lstep = S(t * 2) * 0.05 + 0.08;
-        const step = Math.PI / 1000;
+        const step = Math.PI / 500;
 
-        x.beginPath();
+        let px, py;
         for (let lambda = 0, phi = -HALF_PI; phi < HALF_PI; lambda += lstep, phi += step) {
-            const color = 360 * (phi + HALF_PI) / Math.PI | 0;
-            x.shadowColor = x.strokeStyle = `hsl(${color}, 100%, 50%)`;   // S(t) *  + 180
-            const cx = C(phi) * S(lambda-t) * r + w / 2;
+            const cx = C(phi) * S(lambda-t) * (r + r * 0.08 * Math.random()) + w / 2;
             const cy = (C(t) * S(phi) - S(t) * C(phi) * C(lambda-t)) * r + r;
-            x.lineTo(cx, cy)
+            if (px !== undefined) {
+                const color = 360 * (phi + HALF_PI) / Math.PI | 0;
+                x.beginPath();
+                x.moveTo(px, py);
+                x.lineTo(cx, cy);
+                x.shadowColor = x.strokeStyle = `hsl(${color}, 100%, 50%)`;   // S(t) *  + 180
+                x.lineTo(cx, cy);
+                x.stroke();
+            }
+            px = cx;
+            py = cy;
         }
-        x.stroke();
 
         // x.beginPath();
         // x.ellipse(
